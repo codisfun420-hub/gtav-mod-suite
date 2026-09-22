@@ -19,10 +19,17 @@ void Logger::OpenConsole() {
         SetConsoleTitleA("GTA V Enhanced - Mod Menu Debug Console");
         s_ConsoleActive = true;
 
+        HWND hConsole = GetConsoleWindow();
+        if (hConsole) {
+            SetWindowPos(hConsole, HWND_TOPMOST, 50, 50, 900, 550, SWP_SHOWWINDOW);
+            ShowWindow(hConsole, SW_SHOW);
+        }
+
         printf("\n");
         printf("===============================================================\n");
         printf(" GTA V Enhanced - Live Mod Menu & Hook Diagnostics Console     \n");
         printf("===============================================================\n\n");
+        fflush(stdout);
     }
 }
 
@@ -89,5 +96,6 @@ void Logger::Log(const char* level, const char* format, ...) {
         SetConsoleTextAttribute(hConsole, 15);
         printf("%s\n", buffer);
         SetConsoleTextAttribute(hConsole, 7);
+        fflush(stdout);
     }
 }

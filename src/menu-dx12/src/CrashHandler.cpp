@@ -113,6 +113,19 @@ static LONG WINAPI VectoredCrashHandler(EXCEPTION_POINTERS* pExInfo) {
                 }
                 return EXCEPTION_CONTINUE_EXECUTION;
             }
+
+            // Function 6: +0x1197F1D (movzx ecx, byte ptr [rcx + 0x1f] where rcx=0)
+            // Jump safely to the NULL check branch at +0x1197FB5
+            if (rva >= 0x1197F10 && rva <= 0x1197F25) {
+                LOG_WARN("================================================================================");
+                LOG_WARN("[AUTO-HEALED] Intercepted GTA5_Enhanced.exe null dereference at +0x%IX!", rva);
+                LOG_WARN("Redirecting to safe null branch at +0x1197FB5...");
+                LOG_WARN("================================================================================");
+                if (pExInfo->ContextRecord) {
+                    pExInfo->ContextRecord->Rip = (DWORD_PTR)hMod + 0x1197FB5;
+                }
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
         }
 
         LOG_ERROR("================================================================================");

@@ -133,6 +133,7 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved
 
             std::string logPath = dir + "\\EnhancedImGuiMenu.log";
             Logger::Init(logPath);
+            Logger::OpenConsole();
             CrashHandler::Init();
 
             std::string iniPath = dir + "\\EnhancedImGuiMenu.ini";

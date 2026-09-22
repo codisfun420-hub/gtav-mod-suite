@@ -226,8 +226,8 @@ static void RunEditionFlow(GameProfile profile)
         {
             UI.Section("CRASH REPORT");
             Console.WriteLine();
-            string healBar = new string('#', r.HealCount * 5) + new string('.', (4 - r.HealCount) * 5);
-            UI.KV("Auto-heal", $"[{healBar}]  {r.HealCount}/4");
+            string healBar = new string('#', r.HealCount * 4) + new string('.', (5 - r.HealCount) * 4);
+            UI.KV("Auto-heal", $"[{healBar}]  {r.HealCount}/5");
             UI.KV("Address",   r.FaultAddress  ?? "none");
             UI.KV("Diagnosis", r.Diagnosis     ?? "--");
             UI.KV("Advice",    r.Recommendation ?? "--");
@@ -360,9 +360,9 @@ static void CrashMenu(List<GameProfile> profiles)
         Console.WriteLine($"  +-- {ed} {new string('-', 60 - ed.Length)}+");
         Console.ResetColor();
 
-        string healBar = new string('#', r.HealCount * 5) + new string('.', (4 - r.HealCount) * 5);
-        Console.ForegroundColor = r.HealCount == 4 ? ConsoleColor.Green : ConsoleColor.Yellow;
-        Console.WriteLine($"  |  Auto-Heal   [{healBar}]  {r.HealCount}/4 crashes intercepted");
+        string healBar = new string('#', r.HealCount * 4) + new string('.', (5 - r.HealCount) * 4);
+        Console.ForegroundColor = r.HealCount == 5 ? ConsoleColor.Green : ConsoleColor.Yellow;
+        Console.WriteLine($"  |  Auto-Heal   [{healBar}]  {r.HealCount}/5 crashes intercepted");
         Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.DarkGray;
         Console.WriteLine($"  |  Address     {r.FaultAddress ?? "none"}");

@@ -6,6 +6,25 @@
 std::ofstream Logger::s_LogFile;
 std::mutex Logger::s_Mutex;
 bool Logger::s_Initialized = false;
+bool Logger::s_ConsoleActive = false;
+
+void Logger::OpenConsole() {
+    std::lock_guard<std::mutex> lock(s_Mutex);
+    if (s_ConsoleActive) return;
+
+    if (AllocConsole()) {
+        FILE* fp = nullptr;
+        freopen_s(&fp, "CONOUT$", "w", stdout);
+        freopen_s(&fp, "CONOUT$", "w", stderr);
+        SetConsoleTitleA("GTA V Enhanced - Mod Menu Debug Console");
+        s_ConsoleActive = true;
+
+        printf("\n");
+        printf("===============================================================\n");
+        printf(" GTA V Enhanced - Live Mod Menu & Hook Diagnostics Console     \n");
+        printf("===============================================================\n\n");
+    }
+}
 
 void Logger::Init(const std::string& logPath) {
     std::lock_guard<std::mutex> lock(s_Mutex);
@@ -32,6 +51,10 @@ void Logger::Close() {
         s_LogFile.close();
         s_Initialized = false;
     }
+    if (s_ConsoleActive) {
+        FreeConsole();
+        s_ConsoleActive = false;
+    }
 }
 
 void Logger::Log(const char* level, const char* format, ...) {
@@ -51,4 +74,20 @@ void Logger::Log(const char* level, const char* format, ...) {
 
     s_LogFile << "[" << timeBuf << "] [" << level << "] " << buffer << "\n";
     s_LogFile.flush();
+
+    if (s_ConsoleActive) {
+        WORD color = 7;
+        if (strcmp(level, "ERROR") == 0) color = 12; // Red
+        else if (strcmp(level, "WARN") == 0) color = 14; // Yellow
+        else if (strcmp(level, "INFO") == 0) color = 11; // Cyan
+
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(hConsole, 8);
+        printf("[%s] ", timeBuf);
+        SetConsoleTextAttribute(hConsole, color);
+        printf("[%s] ", level);
+        SetConsoleTextAttribute(hConsole, 15);
+        printf("%s\n", buffer);
+        SetConsoleTextAttribute(hConsole, 7);
+    }
 }

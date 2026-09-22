@@ -98,6 +98,21 @@ static LONG WINAPI VectoredCrashHandler(EXCEPTION_POINTERS* pExInfo) {
                 }
                 return EXCEPTION_CONTINUE_EXECUTION;
             }
+
+            // Function 5: +0x1E97340 (Steam interface getter / mov rax, [rdx+0x48]; ret with RDX=0)
+            if (rva >= 0x1E97330 && rva <= 0x1E97350) {
+                LOG_WARN("================================================================================");
+                LOG_WARN("[AUTO-HEALED] Intercepted GTA5_Enhanced.exe Steam interface crash #5 at +0x%IX!", rva);
+                LOG_WARN("Safely returning NULL (mov rax, 0; ret)...");
+                LOG_WARN("================================================================================");
+                if (pExInfo->ContextRecord) {
+                    auto* stack = (ULONG_PTR*)pExInfo->ContextRecord->Rsp;
+                    pExInfo->ContextRecord->Rip = stack[0]; // Pop return address
+                    pExInfo->ContextRecord->Rsp += 8;
+                    pExInfo->ContextRecord->Rax = 0;        // Return NULL / 0
+                }
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
         }
 
         LOG_ERROR("================================================================================");

@@ -555,10 +555,13 @@ public static class UI
     {
         string modName = mod?.Name ?? "No mod menu";
         string keyLine = mod != null ? $"  Open with: [{mod.OpenKey}]" : "  Running vanilla + crash fixes.";
-        string navLine = mod != null && mod.FileName.Contains("Rampage") 
-            ? "  Navigate: Numpad 8/2 (up/down), 5 (select), 0 (back)" 
+        string navLine1 = mod != null && mod.FileName.Contains("Rampage") 
+            ? "  Navigate: Arrow Up/Down (or Num 8/2)" 
             : "";
-        int iw = 70;
+        string navLine2 = mod != null && mod.FileName.Contains("Rampage") 
+            ? "  Select:   Return / Enter (or Num 5)   |   Back: Delete / Back (or Num 0)" 
+            : "";
+        int iw = 76;
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"  +{new string('=', iw)}+");
@@ -573,12 +576,19 @@ public static class UI
         Console.Write    ($"  |{keyLine}");
         int pad2 = iw - keyLine.Length;
         Console.WriteLine($"{new string(' ', Math.Max(0, pad2))}|");
-        if (!string.IsNullOrEmpty(navLine))
+        if (!string.IsNullOrEmpty(navLine1))
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write($"  |{navLine}");
-            int pad3 = iw - navLine.Length;
+            Console.Write($"  |{navLine1}");
+            int pad3 = iw - navLine1.Length;
             Console.WriteLine($"{new string(' ', Math.Max(0, pad3))}|");
+        }
+        if (!string.IsNullOrEmpty(navLine2))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"  |{navLine2}");
+            int pad4 = iw - navLine2.Length;
+            Console.WriteLine($"{new string(' ', Math.Max(0, pad4))}|");
         }
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"  |{new string(' ', iw)}|");

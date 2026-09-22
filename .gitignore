@@ -1,0 +1,32 @@
+# Build and temporary files
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# C++ binaries and intermediates
+*.obj
+*.o
+*.lib
+*.a
+*.exp
+*.ilk
+*.pdb
+*.idb
+*.asi
+*.dll
+*.exe
+
+# Logs and crash dumps
+*.log
+*.dmp
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS generated files
+.DS_Store
+Thumbs.db

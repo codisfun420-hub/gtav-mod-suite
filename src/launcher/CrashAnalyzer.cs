@@ -20,7 +20,7 @@ namespace GTAVCli
     {
         private static readonly string[] KnownAutoHealOffsets =
         {
-            "1E963D2", "1E9645C", "1E7A330", "1E7F978", "1E97340", "1197F1D"
+            "1E963D2", "1E9645C", "1E7A330", "1E7F978", "1E97340", "1197F1D", "1197CE7"
         };
 
         public static CrashReport Analyze(GameProfile profile)

@@ -126,6 +126,35 @@ static LONG WINAPI VectoredCrashHandler(EXCEPTION_POINTERS* pExInfo) {
                 }
                 return EXCEPTION_CONTINUE_EXECUTION;
             }
+
+            // Function 7: +0x1197CE7 (movzx r9d, word ptr [rcx + 0x18] where rcx=0)
+            // Jump safely to the fallback branch at +0x1197E28
+            if (rva >= 0x1197CE0 && rva <= 0x1197CF0) {
+                LOG_WARN("================================================================================");
+                LOG_WARN("[AUTO-HEALED] Intercepted GTA5_Enhanced.exe null dereference at +0x%IX!", rva);
+                LOG_WARN("Redirecting to safe fallback branch at +0x1197E28...");
+                LOG_WARN("================================================================================");
+                if (pExInfo->ContextRecord) {
+                    pExInfo->ContextRecord->Rip = (DWORD_PTR)hMod + 0x1197E28;
+                }
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+        }
+
+        // Auto-heal AMD FSR / GPU driver null pointer crash during window transition
+        if (code == EXCEPTION_ACCESS_VIOLATION &&
+            (_stricmp(modPath, "amd_fidelityfx_dx12.dll") == 0 || _stricmp(modPath, "amdxc64.dll") == 0)) {
+            LOG_WARN("================================================================================");
+            LOG_WARN("[AUTO-HEALED] Intercepted GPU driver/FSR crash in %s at +0x%IX!", modPath, rva);
+            LOG_WARN("Safely returning failure code to caller...");
+            LOG_WARN("================================================================================");
+            if (pExInfo->ContextRecord) {
+                auto* stack = (ULONG_PTR*)pExInfo->ContextRecord->Rsp;
+                pExInfo->ContextRecord->Rip = stack[0]; // Pop return address
+                pExInfo->ContextRecord->Rsp += 8;
+                pExInfo->ContextRecord->Rax = 0;        // Return 0 / FALSE / DXGI_ERROR_INVALID_CALL
+            }
+            return EXCEPTION_CONTINUE_EXECUTION;
         }
 
         LOG_ERROR("================================================================================");

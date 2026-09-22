@@ -178,6 +178,45 @@ static void RunEditionFlow(GameProfile profile)
         }
     });
 
+    // Live log streamer thread: streams new log lines directly into the CLI terminal!
+    string logFile = Path.Combine(profile.Path, "EnhancedImGuiMenu.log");
+    long lastLogPos = File.Exists(logFile) ? new FileInfo(logFile).Length : 0;
+
+    var logTask = System.Threading.Tasks.Task.Run(() =>
+    {
+        while (!cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                if (File.Exists(logFile))
+                {
+                    using var fs = new FileStream(logFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    if (fs.Length > lastLogPos)
+                    {
+                        fs.Seek(lastLogPos, SeekOrigin.Begin);
+                        using var sr = new StreamReader(fs);
+                        string? line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(line)) continue;
+                            ConsoleColor color = ConsoleColor.DarkGray;
+                            if (line.Contains("[ERROR]")) color = ConsoleColor.Red;
+                            else if (line.Contains("[WARN]") || line.Contains("[AUTO-HEALED]")) color = ConsoleColor.Yellow;
+                            else if (line.Contains("[INFO]")) color = ConsoleColor.Cyan;
+
+                            Console.ForegroundColor = color;
+                            Console.WriteLine($"    {line}");
+                            Console.ResetColor();
+                        }
+                        lastLogPos = fs.Position;
+                    }
+                }
+            }
+            catch { }
+            Thread.Sleep(200);
+        }
+    });
+
     bool ok = StoryModeDetector.WaitForStoryMode(
         profile,
         onProgress: (state, msg) =>

@@ -555,7 +555,10 @@ public static class UI
     {
         string modName = mod?.Name ?? "No mod menu";
         string keyLine = mod != null ? $"  Open with: [{mod.OpenKey}]" : "  Running vanilla + crash fixes.";
-        int iw = 66;
+        string navLine = mod != null && mod.FileName.Contains("Rampage") 
+            ? "  Navigate: Numpad 8/2 (up/down), 5 (select), 0 (back)" 
+            : "";
+        int iw = 70;
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"  +{new string('=', iw)}+");
@@ -570,6 +573,13 @@ public static class UI
         Console.Write    ($"  |{keyLine}");
         int pad2 = iw - keyLine.Length;
         Console.WriteLine($"{new string(' ', Math.Max(0, pad2))}|");
+        if (!string.IsNullOrEmpty(navLine))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"  |{navLine}");
+            int pad3 = iw - navLine.Length;
+            Console.WriteLine($"{new string(' ', Math.Max(0, pad3))}|");
+        }
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"  |{new string(' ', iw)}|");
         Console.WriteLine($"  +{new string('=', iw)}+");

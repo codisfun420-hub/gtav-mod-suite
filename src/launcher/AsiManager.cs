@@ -31,7 +31,7 @@ namespace GTAVCli
             {
                 Name     = "Rampage Trainer",
                 FileName = "Rampage.asi",
-                OpenKey  = "F4"
+                OpenKey  = "F5"
             },
             new ModEntry
             {
@@ -111,6 +111,29 @@ namespace GTAVCli
                     Console.WriteLine($"  [✓] {mod.FileName} (always-on) hersteld");
                 }
             }
+
+            // Ensure loader and bypass files exist
+            EnsureLoaders(profile);
+        }
+
+        public static void EnsureLoaders(GameProfile profile)
+        {
+            string dir = profile.Path;
+            // Restore dinput8.dll if it was disabled
+            string dinp = Path.Combine(dir, "dinput8.dll");
+            string dinpDis = Path.Combine(dir, "dinput8.dll.disabled");
+            if (!File.Exists(dinp) && File.Exists(dinpDis))
+            {
+                File.Copy(dinpDis, dinp, true);
+            }
+
+            // Ensure -nobattleye -noBE in args.txt & commandline.txt
+            try
+            {
+                File.WriteAllText(Path.Combine(dir, "args.txt"), "-nobattleye -noBE");
+                File.WriteAllText(Path.Combine(dir, "commandline.txt"), "-nobattleye -noBE");
+            }
+            catch { }
         }
 
         /// <summary>
@@ -129,6 +152,7 @@ namespace GTAVCli
                     Console.WriteLine($"  [↩] {Path.GetFileName(asi)} hersteld");
                 }
             }
+            EnsureLoaders(profile);
         }
 
         /// <summary>
